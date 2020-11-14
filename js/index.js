@@ -187,6 +187,18 @@ let listBox = document.getElementById('list')
     curLink.index = i; // 设置自定义属性存储A的索引
     curLink.flag = -1;
     curLink.onclick = function () {
+      /*
+      * 解决点击当前标签排序后，切换点击其他标签，然后切换回原来的标签升降序状态改变的问题
+      *  方法：点击当前的A标签，需要让其余的A标签的flag回归原始值-1，这样切换回其他的标签
+      *  还是从-1开始乘，变为1，也就是从升序开始
+      * */
+      for (let j = 0; j < linkList.length; j++) {
+        let item = linkList[j];
+        if (item !== this) {
+          item.flag = -1;
+        }
+      }
+
       this.flag *= -1; // 每一次点击让flag的值从1、-1来回切换
       sortList.call(this);
     };
