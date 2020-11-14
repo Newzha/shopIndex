@@ -97,7 +97,9 @@ let listBox = document.getElementById('list')
         ><a href="javascript:;">
             <img src="${img}" alt="">
             <p>${title}</p>
-            <span>${price}</span>
+            <span>售价：${price}</span>
+            <span>热度：${hot}</span><br>
+            <span>上架时间：${time}</span>
         </a></li>`
   }
   listBox.innerHTML = str;
@@ -121,7 +123,7 @@ let listBox = document.getElementById('list')
      });*/
     // 2.基于sort给所有的LI按照其价格进行排序
     aProduct.sort((a, b) => {
-      //=>a:数组中的当前项
+      /*//=>a:数组中的当前项
       //=>b:数组中的下一项
       // return a-b; 数组当前项减去下一项，
       //  如果返回的值大于零，则A/B交换位置，
@@ -134,17 +136,44 @@ let listBox = document.getElementById('list')
       // 后期需要用到这个值的时候，我们基于自定义属性获取到即可）
       let aPrice = a.getAttribute('data-price')
         , bPrice = b.getAttribute('data-price');
-      return (aPrice - bPrice) * this.flag;
+      return (aPrice - bPrice) * this.flag;*/
+
+      // 需要获取当前点击A的索引,通过索引不同,按照不同的方式进行排序
+      let curA
+        , curB;
+      let aType = ['data-time', 'data-price', 'data-hot'];
+      curA = a.getAttribute(aType[this.index]);
+      curB = b.getAttribute(aType[this.index]);
+      if (this.index === 0) {
+        curA = curA.replace(/-/g, '');
+        curB = curB.replace(/-/g, '');
+      }
+      /*switch(this.index) {
+        case 0:
+          // 日期不能直接的相减，需要把字符串中的“-”去掉在相减
+          curA = a.getAttribute('data-time').replace(/-/g, '');
+          curB = b.getAttribute('data-time').replace(/-/g, '');
+          break;
+        case 1:
+          curA = a.getAttribute('data-price');
+          curB = b.getAttribute('data-price');
+          break;
+        case 2:
+          curA = a.getAttribute('data-hot');
+          curB = b.getAttribute('data-hot');
+          break;
+      }*/
+      return (curA - curB) * this.flag;
     });
     // 3.按照排好序的数组，我们把LI重新增加到页面中
     for (let i = 0; i < aProduct.length; i++) {
       let curLi = aProduct[i];
       // 向容器的末尾追加新元素。但是页面中不是20个,还是原有的10个,只不过顺序改变了
-      listBox.appendChild(curLi)
+      listBox.appendChild(curLi);
     }
   };
 
-  // 做点击切换升降序排列
+  /*// 做点击切换升降序排列
   linkList[1].flag = -1;
   linkList[1].onclick = function () {
     this.flag *= -1; // 每一次点击让flag的值从1、-1来回切换
@@ -152,7 +181,16 @@ let listBox = document.getElementById('list')
     //  (箭头函数虽然很强大，但是不可以乱用，尤其是在需要改变函数中this的情况下，
     //  箭头函数中没有自己的this，都是默认继承上下文中的，我们基于call也改不了)
     sortList.call(this);
-  };
+  };*/
+  for (let i = 0; i < linkList.length; i++) {
+    let curLink = linkList[i];
+    curLink.index = i; // 设置自定义属性存储A的索引
+    curLink.flag = -1;
+    curLink.onclick = function () {
+      this.flag *= -1; // 每一次点击让flag的值从1、-1来回切换
+      sortList.call(this);
+    };
+  }
 })();
 
 /*
