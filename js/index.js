@@ -108,11 +108,17 @@ let listBox = document.getElementById('list')
    * 按照价格升序排列
    */
 
-  let sortList = () => {
+  let sortList = function () {
     // 1.基于getElementsByTagName获取的元素集合是一个类数组，
     //   不能直接使用数组中的SORT方法(我们首先把它转换为数组,然后在排序)
     // 用这种借用SLICE方式操作元素集合或者节点集合，在IE6~8中不兼容
     let aProduct = [].slice.call(productList);
+    /*
+     let _this=this;
+     aProduct.sort(function(a,b){
+         //this:window
+         _this.flag
+     });*/
     // 2.基于sort给所有的LI按照其价格进行排序
     aProduct.sort((a, b) => {
       //=>a:数组中的当前项
@@ -128,7 +134,7 @@ let listBox = document.getElementById('list')
       // 后期需要用到这个值的时候，我们基于自定义属性获取到即可）
       let aPrice = a.getAttribute('data-price')
         , bPrice = b.getAttribute('data-price');
-      return aPrice - bPrice;
+      return (aPrice - bPrice) * this.flag;
     });
     // 3.按照排好序的数组，我们把LI重新增加到页面中
     for (let i = 0; i < aProduct.length; i++) {
@@ -138,8 +144,14 @@ let listBox = document.getElementById('list')
     }
   };
 
+  // 做点击切换升降序排列
+  linkList[1].flag = -1;
   linkList[1].onclick = function () {
-    sortList();
+    this.flag *= -1; // 每一次点击让flag的值从1、-1来回切换
+    // 执行sortList，让方法中的THIS关键字改为操作的A标签
+    //  (箭头函数虽然很强大，但是不可以乱用，尤其是在需要改变函数中this的情况下，
+    //  箭头函数中没有自己的this，都是默认继承上下文中的，我们基于call也改不了)
+    sortList.call(this);
   };
 })();
 
